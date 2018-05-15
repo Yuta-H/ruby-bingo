@@ -22,7 +22,7 @@ class Bingo
     end
   end
 
-  #1〜99の数字を作成
+  # 1〜99の数字を作成
   def create_random_numbers
     (1..99).to_a. shuffle
   end
@@ -34,69 +34,52 @@ class Bingo
 
   def judgement(sheet)
 
-    #判定
-    bingo = nil
-    last_one = nil
-    side_count = 0
-    height_count = 0
-    sheet.each_with_index do |row,i|
-      row.each_with_index do |field,j|
-        if sheet[i][j] == nil
-          side_count += 1
-          if side_count == 5
-            bingo = true
-          elsif side_count == 4
-            last_one = true
-          end
-        end
-        if sheet[i][j] == nil
-          height_count += 1
-          if height_count == 5
-            bingo = true
-          elsif height_count == 4
-            last_one = true
-          end
-        end
-      end
-      side_count = 0
-      height_count = 0
+    #横
+    bingo = false
+    last_one = false
+    sheet.each do |row|
+     if row.count(nil) == 5
+       bingo = true
+     elsif row.count(nil) == 4
+       last_one = true
+     end
     end
 
-    #斜め判定
-    slant_count = 0
-    sheet.each do |row|
-      row.each_with_index do |field,j|
-        if sheet[j][j] == nil
-          slant_count += 1
-          if slant_count == 5
-            bingo = true
-          elsif slant_count == 4
-            last_one = true
-          end
-        end
+    #縦
+    sheet.transpose.each do |row|
+      if row.count(nil) == 5
+        bingo = true
+      elsif row.count(nil) == 4
+        last_one = true
       end
-      slant_count = 0
     end
-    slant_count = 0
-    reverse_sheet = sheet.reverse
-    reverse_sheet.each do |row|
-      row.each_with_index do |field,j|
-        if sheet[j][j] == nil
-          slant_count += 1
-          if slant_count == 5
-            bingo = true
-          elsif slant_count == 4
-            last_one = true
-          end
+
+    #斜め
+    slant_numbers = []
+    transpose_slant_numbers = []
+    (0..4).to_a.each do |j|
+      if sheet[j][j].nil?
+        slant_numbers.push(nil)
+        p slant_numbers
+        if slant_numbers.count(nil) == 5
+          bingo = true
+        elsif slant_numbers.count(nil) == 4
+          last_one = true
         end
       end
-      slant_count = 0
+      if sheet[j][4 - j].nil?
+        transpose_slant_numbers.push(nil)
+        if transpose_slant_numbers.count(nil) == 5
+          bingo = true
+        elsif transpose_slant_numbers.count(nil) == 4
+          last_one = true
+        end
+      end
     end
     return bingo,last_one
   end
 
-
-
+  
   bingo = Bingo.new
 
   #1〜99までのランダムな数字を生成
@@ -122,15 +105,16 @@ class Bingo
           end
         end
       end
+
       #判定
-      bingo,last_one = bingo.judgement(sheet)
+      is_bingo,is_last_one = bingo.judgement(sheet)
       #出力
       bingo.display(sheet)
 
-      if bingo
+      if is_bingo
         print "ビンゴです"
         break
-      elsif last_one
+      elsif is_last_one
         print "リーチです"
       end
     end
